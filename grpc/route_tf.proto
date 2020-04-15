@@ -1,0 +1,83 @@
+// syntax 指定 protocol-buffers 这种 IDL 语言的版本，注意不是 buffers API 的版本
+syntax = "proto3";
+
+// 可以用 import 引入其他 proto 文件
+// import  "other.proto";
+// import public "other2.proto";   // public 引入第三方 proto 文件
+// import weak "other.proto";  // weak 允许该文件不存在
+
+// option java_multiple_files = true;
+// option java_package = "io.grpc.examples.routeguide";
+// option java_outer_classname = "RouteGuideProto";
+// option objc_class_prefix = "RTG";
+
+option optimize_for = SPEED;
+
+package routetf;
+
+// 自己定义一种 message（message 也可以看作是一种 type），格式是 message + 名字
+
+// message 中每一条叫 fields（字段），每一个 fields 有 name 和 type，等号后面的叫 field number
+// message 会被编译成不同语言中相应的对象
+
+// 对于 field number，必须是唯一的，范围从 1 到 2^29-1，但 19000 到 19999 不可以用，是 Protocol Buffers implementation 的保留编号。
+// 特别的，1~15 是用单字节编码的，16~2047 是双字节编码，
+// 也就是说 1~15 留给 message 中经常发生的元素，同时还要注意保留一些编号给将来可能添加的高频元素
+
+// 对于 fields 的 types，可以是标量类型，比如 int 和 string，也可以是枚举和 message
+
+// 对于每个 field，可以下面任意一种类型：
+// singular：可以包含一个 0~1 这种
+
+// 综合起来格式就是
+// [ "repeated" ] type fieldName "=" fieldNumber [ "[" fieldOptions "]" ] ";"
+// 这里双引号括起来是为了表达字符串的意思，不是代码的一部分
+// 复杂的结构，前面可以定义为repeated, 序号之后可以定义一些可选项
+
+// -I 指定 protoc 指定protoc的搜索import的proto的文件夹
+// python 输出
+// python -m grpc_tools.protoc -Iroute_tf --python_out=./route_tf --grpc_python_out=./route_tf route_tf/route_tf.proto
+// C#
+// python -m grpc_tools.protoc -Iroute_tf --csharp_out=./route_tf --grpc_python_out=./route_tf route_tf/route_tf.proto
+
+service RouteTF {
+  rpc GetFeature(Image) returns (Mask) {}
+  rpc RecordRoute(stream Image) returns (Mask) {}
+  rpc RouteChat(stream Image) returns (stream Mask) {}
+}
+
+message Image {
+  string filename = 1;
+  bytes data = 2;
+}
+
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Roi {
+  Point leftup = 1;
+  Point rightbottom = 2;
+}
+
+// 当前 Pixel 是否属于某一个或几个类，一个 bool 数组
+message PixelType {
+  repeated bool belongs = 1;
+}
+
+message MaskRow { // 一行的 Mask 情况
+  repeated PixelType pixeltypes = 1;
+}
+
+message Mask {
+  string filename = 1; // 图像文件名
+  repeated Roi rois = 2;
+  repeated int32 class_ids = 3;
+  repeated double scores = 4;
+  repeated MaskRow mask = 5; // 若干行组成了一整个 Mask
+}
+
+message MaskBatch {
+  repeated Mask masks = 1;
+}

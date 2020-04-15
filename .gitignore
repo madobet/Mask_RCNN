@@ -2,6 +2,7 @@
 datasets/
 logs/
 *.h5
+*.pb
 results/
 temp/
 test/
@@ -56,3 +57,10 @@ pip-delete-this-directory.txt
 .venv
 venv/
 ENV/
+
+*_pb2*.py
+
+oh-my-zsh/
+
+tools/docker/*.Dockerfile
+!tools/docker/example_*.Dockerfile
