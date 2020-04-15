@@ -9,5 +9,9 @@ keras>=2.0.8
 opencv-python
 h5py
 imgaug
-jupyter-lab
+IPython[All]
+jupyterlab
 tensorflow-serving-api>=2.1.0
+grpcio-tools
+PyQt5
+# pycocotoools # Unsupported on Windows
