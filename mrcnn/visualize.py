@@ -84,7 +84,7 @@ def apply_mask(image, mask, color, alpha=0.5):
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
-                      show_mask=True, show_bbox=True,
+                      show_mask=True, show_bbox=True, show_label=True,
                       colors=None, captions=None, save_path=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
@@ -146,9 +146,10 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             caption = "与{}的匹配度{:.3f}".format(label, score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color=color, backgroundcolor="w")
-                # color='w', size=11, backgroundcolor="none")
+        if show_label:
+            ax.text(x1, y1 + 8, caption,
+                    color=color, backgroundcolor="w")
+                    # color='w', size=11, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]

@@ -6,24 +6,16 @@ import time
 import math
 import numpy as np
 import skimage.io
-from matplotlib import rcParams
-rcParams['font.family'] = ['sans-serif']
-rcParams['font.weight'] = 'semibold'
-rcParams['font.size'] = 14
-rcParams['font.sans-serif'] = ['Sarasa Gothic SC', 'SimHei', 'sans-serif']
-# rcParams['axes.unicode_minus'] = False
-# from matplotlib.font_manager import _rebuild
-# _rebuild()
 import matplotlib.pyplot as plt
 import pickle
 import json
-# import pandas as pd
 import requests
 
 import grpc
 from tensorflow_serving.apis import prediction_service_pb2_grpc
 from tensorflow_serving.apis import predict_pb2
-import tensorflow as tf
+# import tensorflow as tf
+from tensorflow.python.framework.tensor_util import make_tensor_proto
 
 # MRCNN_DIR = os.path.abspath("../")
 # COCO_DIR = os.path.abspath(MRCNN_DIR + '/samples')
@@ -100,6 +92,7 @@ class InferenceConfig(CocoConfig):
     #     self.IMAGES_PER_GPU = img_per_gpu
 
 class MaskRCNNClient():
+    # TODO 重构成继承 MaskRCNN 类
     def __init__(self, host, class_names=DEFAULT_CLASS_NAMES_CN):
         """ host 格式： ip/domain:port
         """
@@ -247,8 +240,8 @@ class MaskRCNNClient():
         # Step 1
         channel = grpc.insecure_channel(self.host, options=[(
             'grpc.max_receive_message_length', 4096 * 4096 * 3)])
-
         stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
+        print('Connected to', self.host)
 
         # proto 里定义了一种 PredictRequest message，对其进行装填
         request = predict_pb2.PredictRequest()
@@ -257,14 +250,21 @@ class MaskRCNNClient():
         np.expand_dims(self.image, axis=0)
 
         request.inputs['input_image'].CopyFrom(
-            tf.make_tensor_proto(np.expand_dims(molded_image, axis=0), shape=np.expand_dims(molded_image, axis=0).shape, dtype="float32"))
+            # tf.make_tensor_proto(np.expand_dims(molded_image, axis=0), shape=np.expand_dims(molded_image, axis=0).shape, dtype="float32"))
+            make_tensor_proto(np.expand_dims(molded_image, axis=0), shape=np.expand_dims(molded_image, axis=0).shape,
+                             dtype="float32"))
         request.inputs['input_image_meta'].CopyFrom(
-            tf.make_tensor_proto(np.expand_dims(image_meta, axis=0), shape=np.expand_dims(image_meta, axis=0).shape, dtype="float32"))
+            # tf.make_tensor_proto(np.expand_dims(image_meta, axis=0), shape=np.expand_dims(image_meta, axis=0).shape, dtype="float32"))
+            make_tensor_proto(np.expand_dims(image_meta, axis=0), shape=np.expand_dims(image_meta, axis=0).shape,
+                             dtype="float32"))
         request.inputs['input_anchors'].CopyFrom(
-            tf.make_tensor_proto(np.expand_dims(anchors, axis=0), shape=np.expand_dims(anchors, axis=0).shape, dtype="float32"))
+            # tf.make_tensor_proto(np.expand_dims(anchors, axis=0), shape=np.expand_dims(anchors, axis=0).shape, dtype="float32"))
+            make_tensor_proto(np.expand_dims(anchors, axis=0), shape=np.expand_dims(anchors, axis=0).shape,
+                             dtype="float32"))
 
-        # 调用远端 RPC: Predict
+        print('Uploading...')
         grpc_result = stub.Predict(request)
+        print('Got prediction, destructuring result...')
 
         # Step 2
         grpc_mrcnn_detection = np.array(
@@ -280,17 +280,17 @@ class MaskRCNNClient():
         self.scores = grpc_scores
         self.masks = grpc_masks
 
-    def display(self, size=(20.12,15.18), fpath=None):
+    def display(self, title=None, figsize=(16, 16), axes=None, show_mask=True, show_bbox=True, show_label=True, fpath=None):
         """ 当 fpath 为 None 新开窗口显示结果
             不为 None 则保存处理后的图像到指定位置
             figsize 单位是英寸
         """
-        # visualize.display_instances(self.image, self.rois, self.masks, self.class_ids,
-        #                             self.class_names, self.scores, title='Mask RCNN Demo', save_path=fpath
-        # )
-        visualize.display_instances(self.image, self.rois, self.masks, self.class_ids,
-                                    self.class_names, self.scores, figsize=size, save_path=fpath
-                                    )
+        # colors = None, captions = None, save_path = None
+        if axes:
+            axes.cla()
+        visualize.display_instances(self.image, self.rois, self.masks, self.class_ids, self.class_names,
+                                    self.scores, title, figsize, axes, show_mask, show_bbox, show_label,
+                                    save_path=fpath)
 
     def debug(self):
         """ 打印类的调试信息

@@ -64,3 +64,5 @@ oh-my-zsh/
 
 tools/docker/*.Dockerfile
 !tools/docker/example_*.Dockerfile
+
+*.spec
