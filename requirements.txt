@@ -4,14 +4,14 @@ Pillow
 cython
 matplotlib
 scikit-image
-tensorflow>=2.1.0
+tensorflow
 keras>=2.0.8
 opencv-python
 h5py
 imgaug
 IPython[All]
 jupyterlab
-tensorflow-serving-api>=2.1.0
+tensorflow-serving-api
 grpcio-tools
 PyQt5
 # pycocotoools # Unsupported on Windows

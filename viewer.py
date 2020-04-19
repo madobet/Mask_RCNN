@@ -90,7 +90,7 @@ class ResultViewer(QMainWindow):
 
         # ----- Part3 菜单栏 -----
         menu_file = self.menubar.addMenu("&文件")
-        menu_file.addAction(act_savefile)
+        # menu_file.addAction(act_savefile)
         menu_file.addAction(act_close)
 
         menu_view = self.menubar.addMenu("&视图")

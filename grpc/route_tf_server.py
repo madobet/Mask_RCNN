@@ -23,13 +23,11 @@ print(IMAGE_DIR)
 
 
 def get_feature(request):
-    # 利用 io + Pillow 读进来的是一个 Pillow 的 Image 对象
+    # io + Pillow 读入 Pillow 的 Image 对象
     # img = Image.open(io.BytesIO(request.data))
 
-    # 从文件中读取
     # img = skimage.io.imread(os.path.join(IMAGE_DIR,os.path.join(IMAGE_DIR, file_name)))
     print(request.filename)
-    # 一个更好的解决方案：https://github.com/scikit-image/scikit-image/issues/2889#issuecomment-346265162
     img = skimage.io.imread(request.data, plugin='imageio', format='jpg')
 
     skimage.io.imsave("success.jpg", img, format='jpg')
@@ -69,7 +67,6 @@ def get_feature(request):
 
 
 class RouteTFServicer(route_tf_pb2_grpc.RouteTFServicer):
-    # def __init__(self): # 构造函数，或者更确切的是初始化步骤
 
     def GetFeature(self, request, context):
         return get_feature(request)

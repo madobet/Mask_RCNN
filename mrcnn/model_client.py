@@ -35,7 +35,7 @@ from mrcnn.model import MaskRCNN
 # from samples.coco.coco import CocoConfig # Requires pycocotools
 from mrcnn.config import Config
 class CocoConfig(Config):
-    """Configuration for training on MS COCO.
+    """Configuration for training on MS COCO.CocoConfig
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
     """
@@ -94,7 +94,7 @@ class InferenceConfig(CocoConfig):
 class MaskRCNNClient():
     # TODO 重构成继承 MaskRCNN 类
     def __init__(self, host, class_names=DEFAULT_CLASS_NAMES_CN):
-        """ host 格式： ip/domain:port
+        """ host 格式 ip/domain:port
         """
         self.host = host
         self.class_names = class_names
@@ -293,7 +293,7 @@ class MaskRCNNClient():
                                     save_path=fpath)
 
     def debug(self):
-        """ 打印类的调试信息
+        """ 打印调试信息
         """
         self.cococonfig.display()
         print('class names:', self.class_names)

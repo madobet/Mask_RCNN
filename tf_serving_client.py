@@ -5,7 +5,6 @@ import sys
 import argparse
 from mrcnn.model_client import MaskRCNNClient
 from PyQt5.QtWidgets import QApplication, qApp, QStyleFactory
-from PyQt5.QtCore import QUrl
 from mainw import ClientGUI
 
 # plot format
@@ -35,8 +34,6 @@ def clientCLI(host, fpath, opath=None):
     dpi_y = qApp.desktop().logicalDpiY()
     print("Screen: %d, %d\nDPI: %d, %d" % (pix_width, pix_height, dpi_x, dpi_y))
     grpc_ser.display("Mask RCNN Demo", (pix_width/dpi_x, pix_height/dpi_y), fpath=opath)
-
-from PyQt5.QtQuick import QQuickView
 
 def clientGUI():
     app = QApplication(sys.argv)

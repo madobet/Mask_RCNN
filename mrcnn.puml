@@ -1,0 +1,40 @@
+@startuml
+class Config {
+    string NAME = None
+    int GPU_COUNT = 1
+    int IMAGES_PER_GPU = 2
+    int STEPS_PER_EPOCH = 1000
+}
+note left of Config: 存储和处理一系列的模型参数和配置\n\
+NAME: 该配置的名称\n\
+GPU_COUNT: 使用的 GPU 数量，如果仅使用 CPU，应设为 1\n\
+IMAGES_PER_GPU: 每张 GPU 训练的图像数量\n\
+STEPS_PER_EPOCH: 每个 epoch 的训练数\n\
+VALIDATION_STEPS:\n\
+BACKBONE:\n\
+COMPUTE_BACKBONE_SHAPE:\n\
+BACKBONE_STRIDES:\n\
+FPN_CLASSIF_FC_LAYERS_SIZE:\n\
+TOP_DOWN_PYRAMID_SIZE:\n\
+NUM_CLASSES:\n\
+RPN_ANCHOR_SCALES:\n\
+RPN_ANCHOR_RATIOS:\n\
+RPN_ANCHOR_STRIDE:\n\
+RPN_NMS_THRESHOLD:\n\
+RPN_TRAIN_ANCHORS_PER_IMAGE:\n\
+PRE_NMS_LIMIT:\n\
+POST_NMS_ROIS_TRAINING:\n\
+POST_NMS_ROIS_INFERENCE:\n\
+USE_MINI_MASK:\n\
+MINI_MASK_SHAPE:\n\
+IMAGE_RESIZE_MODE:\n\
+IMAGE_MIN_DIM:\n\
+IMAGE_MAX_DIM:\n\
+IMAGE_MIN_SCALE:\n\
+
+' Class01 <|-- Class02
+' Class03 *-- Class04
+' Class05 o-- Class06
+' Class07 .. Class08
+' Class09 -- Class10
+@enduml

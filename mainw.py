@@ -5,7 +5,7 @@ from math import pow
 
 from mrcnn.model_client import MaskRCNNClient
 
-from PyQt5.QtCore import Qt, QCoreApplication, QObject, pyqtSignal, QUrl, QThread   # QCoreApplication 包含事件主循环 能添加和删除所有事件
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl, QThread   # QCoreApplication 包含事件主循环 能添加和删除所有事件
 from PyQt5.QtGui import QIcon, QFont, QImage, QPixmap, QPalette, QTextCursor
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QToolTip, QWidget, QDesktopWidget,
                              QAction, QFileDialog, QMenu, qApp, QGridLayout,
@@ -157,7 +157,7 @@ class ClientGUI(QMainWindow):
         menu_window = self.menubar.addMenu("&窗口")
         menu_window.addAction(stat_act_statbar)
 
-        menu_help = self.menubar.addMenu("&帮助")
+        # menu_help = self.menubar.addMenu("&帮助")
 
         # ----- Part4 工具栏 -----
 
