@@ -26,19 +26,16 @@ class Detection(QThread):
     resultStat = pyqtSignal(str)
     resultReady = pyqtSignal()
 
-    def __init__(self, host, fpath):
+    def __init__(self, client_obj, fpath):
         super().__init__()
-        self.host = host
+        self.client_obj = client_obj
         self.path = fpath
 
     def run(self):
         # dialog_upload = QDialog(parent)
-        self.resultProgress.emit(10)
-        self.resultStat.emit("连接到 " + self.host)
-        self.result = MaskRCNNClient(self.host)
         self.resultProgress.emit(50)
         self.resultStat.emit("图像处理中……")
-        self.result.grpc_request(self.path)
+        self.client_obj.grpc_request(self.path)
         self.resultProgress.emit(100)
         self.resultStat.emit("图像处理完毕")
         self.resultReady.emit()
@@ -113,6 +110,11 @@ class ClientGUI(QMainWindow):
         self.lineedit_host = QLineEdit("ws.verniy.org", self.widget_main)
         self.lineedit_host.setToolTip("服务器的域名或 IP 地址[:端口]")
 
+        # 连接按钮
+        button_connect = QPushButton("连接", self.widget_main)
+        button_connect.setToolTip("连接服务器")
+        button_connect.clicked.connect(self.pressConnect)
+
         # 打开按钮
         self.lineedit_fpath = QLineEdit("未指定文件", self.widget_main)
         self.lineedit_fpath.setReadOnly(True)
@@ -174,7 +176,8 @@ class ClientGUI(QMainWindow):
         layout_main.addWidget(self.scroll_preview,  1, 1, 5, 1)
 
         layout_main.addWidget(label_host,           1, 2)
-        layout_main.addWidget(self.lineedit_host,   1, 3, 1, 3)
+        layout_main.addWidget(self.lineedit_host,   1, 3, 1, 2)
+        layout_main.addWidget(button_connect,       1, 5)
 
         layout_main.addWidget(self.lineedit_fpath,  2, 2, 1, 3)
         layout_main.addWidget(button_open,          2, 5)
@@ -222,12 +225,16 @@ class ClientGUI(QMainWindow):
         else:
             self.statusbar.hide()
 
-    def pressUpload(self):
+    def pressConnect(self):
         url = QUrl("https://" + self.lineedit_host.text(), QUrl.StrictMode)
         host = url.host() + ":" + str(url.port(8500))
+        self.client_obj = MaskRCNNClient(host)
+        print('Connected to', host)
+
+    def pressUpload(self):
         # if self.lineedit_fpath == self.file_path:
         progressdialog_detect = QProgressDialog("准备执行检测……", "取消", 0, 100, self.widget_main)
-        self.thread_detect = Detection(host, self.file_path)
+        self.thread_detect = Detection(self.client_obj, self.file_path)
         self.thread_detect.resultProgress.connect(progressdialog_detect.setValue)
         self.thread_detect.resultStat.connect(progressdialog_detect.setLabelText)
         # Detection.resultReady.connect(self.preview)  # Detection 线程类的 resultReady signal 插入 preview slot
@@ -251,7 +258,7 @@ class ClientGUI(QMainWindow):
 
     # slot: preview
     def preview(self):
-        detect_result = self.thread_detect.result
+        detect_result = self.thread_detect.client_obj
         if self.chbox_verbose.isChecked():
             detect_result.debug()
         print("可视化...")

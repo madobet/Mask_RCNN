@@ -17,4 +17,4 @@ setup(  name = "tf_detection",
         version = "0.1",
         description="Tensorflow Detection",
         options={ "build_exe": build_exe_options },
-        executables = [Executable("tf_serving_client.py", base=base)])
+        executables = [Executable("tf_detection.py", base=base)])

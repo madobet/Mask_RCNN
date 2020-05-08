@@ -1,15 +1,11 @@
 # -*- coding: UTF-8 -*-
-import os
-import sys
-import random
-import time
-import math
+# import os
+# import sys
+# import random
+# import time
+# import math
 import numpy as np
 import skimage.io
-import matplotlib.pyplot as plt
-import pickle
-import json
-import requests
 
 import grpc
 from tensorflow_serving.apis import prediction_service_pb2_grpc
@@ -17,40 +13,10 @@ from tensorflow_serving.apis import predict_pb2
 # import tensorflow as tf
 from tensorflow.python.framework.tensor_util import make_tensor_proto
 
-# MRCNN_DIR = os.path.abspath("../")
-# COCO_DIR = os.path.abspath(MRCNN_DIR + '/samples')
-# UTILS_DIR = os.path.abspath(MRCNN_DIR + '/utils')
-# sys.path.append(MRCNN_DIR)
-# sys.path.append(COCO_DIR)
-# sys.path.append(UTILS_DIR)
-# print(MRCNN_DIR)
-# print(COCO_DIR)
-# print(UTILS_DIR)
-
 from mrcnn import model
 from mrcnn import utils
 from mrcnn import visualize
 from mrcnn.model import MaskRCNN
-
-# from samples.coco.coco import CocoConfig # Requires pycocotools
-from mrcnn.config import Config
-class CocoConfig(Config):
-    """Configuration for training on MS COCO.CocoConfig
-    Derives from the base Config class and overrides values specific
-    to the COCO dataset.
-    """
-    # Give the configuration a recognizable name
-    NAME = "coco"
-
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
-
-    # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
-
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 80  # COCO has 80 classes
 
 DEFAULT_CLASS_NAMES = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                        'bus', 'train', 'truck', 'boat', 'traffic light',
@@ -84,6 +50,9 @@ DEFAULT_CLASS_NAMES_CN = ['BG', '人', '单车', '汽车', '摩托', '飞机',
                           '水槽', '冰箱', '书', '钟', '花盆', '剪刀',
                           '泰迪熊', '电吹风', '牙刷']
 
+# from samples.coco.coco import CocoConfig # Requires pycocotools
+from mrcnn.config import CocoConfig
+
 class InferenceConfig(CocoConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
@@ -96,10 +65,13 @@ class MaskRCNNClient():
     def __init__(self, host, class_names=DEFAULT_CLASS_NAMES_CN):
         """ host 格式 ip/domain:port
         """
-        self.host = host
         self.class_names = class_names
         # print('TF Serving server:', self.hostname)
         self.cococonfig = InferenceConfig()
+
+        channel = grpc.insecure_channel(host, options=[(
+            'grpc.max_receive_message_length', 4096 * 4096 * 3)])
+        self.stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
     def img_preprocess(self, img):
         """Pre-processes the input image.
@@ -237,11 +209,6 @@ class MaskRCNNClient():
         # 图像预处理
         molded_image, image_meta, anchors, window = self.img_preprocess(
             self.image)
-        # Step 1
-        channel = grpc.insecure_channel(self.host, options=[(
-            'grpc.max_receive_message_length', 4096 * 4096 * 3)])
-        stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
-        print('Connected to', self.host)
 
         # proto 里定义了一种 PredictRequest message，对其进行装填
         request = predict_pb2.PredictRequest()
@@ -263,7 +230,7 @@ class MaskRCNNClient():
                              dtype="float32"))
 
         print('Uploading...')
-        grpc_result = stub.Predict(request)
+        grpc_result = self.stub.Predict(request)
         print('Got prediction, destructuring result...')
 
         # Step 2
