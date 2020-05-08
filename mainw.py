@@ -79,6 +79,11 @@ class ClientGUI(QMainWindow):
         act_openfile.setStatusTip("打开 JPG 或 PNG 格式图像文件")   # 状态栏提示
         act_openfile.triggered.connect(self.actionOpenFile)
 
+        act_openfolder = QAction("打开文件夹", self)
+        act_openfolder.setShortcut("Ctrl+F")
+        act_openfolder.setStatusTip("打开文件夹读入图片")   # 状态栏提示
+        act_openfolder.triggered.connect(self.actionOpenFolder)
+
         act_quit = QAction(QIcon("exit.png"), "&退出", self)
         act_quit.setShortcut("Ctrl+Q")
         act_quit.setStatusTip("退出程序")   # 状态栏提示
@@ -105,7 +110,7 @@ class ClientGUI(QMainWindow):
         # 服务器地址和端口
         label_host = QLabel("主机名")
         # self.lineedit_host = QLineEdit("localhost", self.widget_main)
-        self.lineedit_host = QLineEdit("cn.verniy.org", self.widget_main)
+        self.lineedit_host = QLineEdit("ws.verniy.org", self.widget_main)
         self.lineedit_host.setToolTip("服务器的域名或 IP 地址[:端口]")
 
         # 打开按钮
@@ -151,6 +156,7 @@ class ClientGUI(QMainWindow):
         menu_file = self.menubar.addMenu("&文件")
         menu_open = QMenu("打开", self)
         menu_open.addAction(act_openfile)
+        menu_open.addAction(act_openfolder)
         menu_file.addMenu(menu_open)
         menu_file.addAction(act_quit)
 
@@ -187,19 +193,28 @@ class ClientGUI(QMainWindow):
         self.statusbar.showMessage("就绪")
 
     def actionOpenFile(self):
-        self.fpath = QFileDialog.getOpenFileUrl(self, "打开文件", filter="Images (*.png *.jpg)")
-        if not self.fpath[0].isValid():
+        self.file_path = QFileDialog.getOpenFileUrl(self, "打开文件", filter="Images (*.png *.jpg)")
+        if not self.file_path[0].isValid():
             return
-        self.fname = self.fpath[0].fileName()
-        self.fpath = self.fpath[0].toLocalFile()
-        self.lineedit_fpath.setText(self.fpath)
-        self.image_ori = QImage(self.fpath)
+        self.file_name = self.file_path[0].fileName()
+        self.file_path = self.file_path[0].toLocalFile()
+        self.lineedit_fpath.setText(self.file_path)
+        self.image_ori = QImage(self.file_path)
         self.slider_scale.setValue(0)
         # self.newText.emit(str(text))
         self.slider_scale.valueChanged.emit(0)  # 必须强制发送一次，否则如果上次未变化，会没有这个消息
         # self.label_image.setGeometry(0, 0, self.image_ori.width(), self.image_ori.height())
         # self.label_image.setPixmap(QPixmap.fromImage(self.image_ori))
-        print("打开 " + self.fpath)
+        print("打开 " + self.file_path)
+
+    def actionOpenFolder(self):
+        self.folder_path = QFileDialog.getExistingDirectoryUrl(self, "打开文件夹")
+        if not self.folder_path.isValid():
+            return
+        self.folder_name = self.folder_path.fileName()
+        self.folder_path = self.folder_path.toLocalFile()
+        self.lineedit_fpath.setText(self.folder_path)
+        print("打开 " + self.folder_path)
 
     def toggleStatusBar(self, state):
         if state:
@@ -210,14 +225,17 @@ class ClientGUI(QMainWindow):
     def pressUpload(self):
         url = QUrl("https://" + self.lineedit_host.text(), QUrl.StrictMode)
         host = url.host() + ":" + str(url.port(8500))
+        # if self.lineedit_fpath == self.file_path:
         progressdialog_detect = QProgressDialog("准备执行检测……", "取消", 0, 100, self.widget_main)
-        self.thread_detect = Detection(host, self.fpath)
+        self.thread_detect = Detection(host, self.file_path)
         self.thread_detect.resultProgress.connect(progressdialog_detect.setValue)
         self.thread_detect.resultStat.connect(progressdialog_detect.setLabelText)
         # Detection.resultReady.connect(self.preview)  # Detection 线程类的 resultReady signal 插入 preview slot
         self.thread_detect.resultReady.connect(self.preview)  # Detection 线程对象的 resultReady signal 插入 preview slot
         progressdialog_detect.canceled.connect(self.thread_detect.exit)
         self.thread_detect.start()
+        # elif self.lineedit_fpath == self.folder_path:
+        # TODO 检测文件变化
 
     def pressScaleReset(self):
         self.slider_scale.setValue(0)

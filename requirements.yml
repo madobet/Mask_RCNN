@@ -1,50 +1,25 @@
-name: base
 channels:
   - defaults
   - conda-forge
 dependencies:
-  - ansible
-  - ansible-kernel
-  - ansible-runner
-  - bash_kernel
+  - grpcio-tools
+  - h5py
   - imgaug
+  - ipython[All]
   - jupyter
-  - jupyterhub
   - jupyterlab
-  - jupyterlab-dash
-  - jupyterlab-git
-  - jupyterlab-nvdashboard
-  - jupyterlab-transient-display-data
-  - jupyterlab_heroku
-  - jupyterlab_server
-  - jupyterthemes
   - keras
+  - numpy
   - opencv
   - pip
-  - pycocotools
+  - pipenv
+  - protobuf
+  # - pycocotools # unsupported on Windows
   - pygments
   - pyqt
   - scikit-image
+  - scipy
   - tensorflow
   - tensorflow-gpu
   - pip:
-      - gnuplot-kernel
-      - google-auth
-      - jupyter-c-kernel
-      - markdown
-      - matlab-kernel
-      - metakernel
-      - numpy
-      - opt-einsum
-      - plumbum
-      - portalocker
-      - powershell-kernel
-      - protobuf
-      - pyasn1-modules
-      - pyqt5-sip
-      - pyqtwebengine
-      - setuptools
-      - sshkernel
-      - tensorboard
-      - wurlitzer
-      - zsh-jupyter-kernel
+      - tensorflow-serving-api

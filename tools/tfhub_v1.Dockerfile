@@ -16,7 +16,7 @@ RUN npm install -g configurable-http-proxy
 
 RUN pip uninstall -y enum34
 COPY tfhub_v1_requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install --timeout 600 -r /tmp/requirements.txt
 RUN pip install pycocotools
 
 RUN apt-get install -y libsm6 libxext6 libxrender-dev fontconfig fonts-powerline
@@ -27,4 +27,5 @@ RUN echo 'tfhub:hub?112358!' | chpasswd
 
 WORKDIR /tmp
 RUN echo "c.Spawner.default_url = '/lab'" > jupyterhub_config.py
-ENTRYPOINT [ "jupyterhub", "--no-db", "--url=http://:8000/jupyter", "--y=True" ]
+# ENTRYPOINT [ "jupyterhub", "--no-db", "--url=http://:8000/jupyter", "--y=True" ]
+CMD [ "jupyterhub", "--no-db", "--url=http://:8000/jupyter", "--y=True" ]

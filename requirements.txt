@@ -14,4 +14,4 @@ jupyterlab
 tensorflow-serving-api
 grpcio-tools
 PyQt5
-# pycocotoools # Unsupported on Windows
+# pycocotoools # unsupported on Windows

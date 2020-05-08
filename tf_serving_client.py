@@ -3,8 +3,8 @@
 import os
 import sys
 import argparse
-from mrcnn.model_client import MaskRCNNClient
 from PyQt5.QtWidgets import QApplication, qApp, QStyleFactory
+from mrcnn.model_client import MaskRCNNClient
 from mainw import ClientGUI
 
 # plot format
@@ -22,18 +22,17 @@ progversion = "0.1"
 
 IS_DEBUG = False
 
-def clientCLI(host, fpath, opath=None):
+def clientCLI(host, fpath, opath=None, width=1920, height=1080, dpi=96):
     grpc_ser = MaskRCNNClient(host)
     grpc_ser.grpc_request(fpath)
     if IS_DEBUG:
         grpc_ser.debug()
     print('Visualizing result...')
-    pix_width = QApplication.desktop().width()
-    pix_height = QApplication.desktop().height()
-    dpi_x = qApp.desktop().logicalDpiX()
-    dpi_y = qApp.desktop().logicalDpiY()
-    print("Screen: %d, %d\nDPI: %d, %d" % (pix_width, pix_height, dpi_x, dpi_y))
-    grpc_ser.display("Mask RCNN Demo", (pix_width/dpi_x, pix_height/dpi_y), fpath=opath)
+    app = QApplication(sys.argv)
+    dpi_x: int = dpi
+    dpi_y: int = dpi
+    print("Size: %d, %d\nDPI: %d, %d" % (width, height, dpi_x, dpi_y))
+    grpc_ser.display("Mask RCNN Demo", (width/dpi_x, height/dpi_y), fpath=opath)
 
 def clientGUI():
     app = QApplication(sys.argv)
@@ -60,6 +59,12 @@ def entry():
                         default='8500', help='通信端口（默认：8500）')
     parser.add_argument('-o', '--out', metavar='OUTPUT',
                         default=None, help='处理后的图像文件输出路径（不指定则输出到屏幕）')
+    parser.add_argument('--width', metavar='PIXEL',
+                        default=1920, help='输出图像的宽度（像素，默认:1920）')
+    parser.add_argument('--height', metavar='PIXEL',
+                        default=1080, help='输出图像的高度（像素，默认:1080）')
+    parser.add_argument('--dpi', metavar='DPI',
+                        default=96, help='输出图像的DPI（默认:96）')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='打印调试信息')
     args = parser.parse_intermixed_args()
