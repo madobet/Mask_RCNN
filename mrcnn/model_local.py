@@ -105,7 +105,8 @@ class MaskRCNNLocal():
             self.images.append(skimage.io.imread(img_path))
 
         # Run detection
-        self.results = self.model.detect(self.images, verbose=1)
+        # self.results = self.model.detect(self.images, verbose=1)
+	    self.results = self.model.detect(self.images, verbose=0)
 
     def display(self, title=None, figsize=(16, 16), axes=None, show_mask=True, show_bbox=True, show_label=True, fpath=None):
         """ 当 fpath 为 None 新开窗口显示结果

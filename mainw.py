@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 import sys
 from math import pow
 
-from mrcnn.model_client import MaskRCNNClient
-
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl, QThread   # QCoreApplication 包含事件主循环 能添加和删除所有事件
 from PyQt5.QtGui import QIcon, QFont, QImage, QPixmap, QPalette, QTextCursor
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QToolTip, QWidget, QDesktopWidget,
@@ -107,7 +105,7 @@ class ClientGUI(QMainWindow):
         # 服务器地址和端口
         label_host = QLabel("主机名")
         # self.lineedit_host = QLineEdit("localhost", self.widget_main)
-        self.lineedit_host = QLineEdit("ws.verniy.org", self.widget_main)
+        self.lineedit_host = QLineEdit("192.168.7.7", self.widget_main)
         self.lineedit_host.setToolTip("服务器的域名或 IP 地址[:端口]")
 
         # 连接按钮
@@ -226,6 +224,7 @@ class ClientGUI(QMainWindow):
             self.statusbar.hide()
 
     def pressConnect(self):
+        from mrcnn.model_client import MaskRCNNClient
         url = QUrl("https://" + self.lineedit_host.text(), QUrl.StrictMode)
         host = url.host() + ":" + str(url.port(8500))
         self.client_obj = MaskRCNNClient(host)
