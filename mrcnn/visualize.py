@@ -171,7 +171,6 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     if auto_show:
         if save_path:
             plt.savefig(save_path)
-            print('Image saved to:', os.path.abspath(save_path))
         else:
             plt.show()
 

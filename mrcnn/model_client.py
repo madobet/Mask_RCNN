@@ -200,8 +200,9 @@ class MaskRCNNClient():
         return boxes, class_ids, scores, full_masks
 
 
-    def grpc_request(self, img_path):
-        """ 向服务器发起请求并将返回结果存放于 MaskRCNNClient 类中
+    def detect(self, img_path, verbose=0):
+        """ 向服务器发起请求并将返回结果存放于 MaskRCNNClient 类中，
+            保持接口一致因此名 detect
         """
         self.image = skimage.io.imread(img_path)
         # self.image = self.img_transform(image, pad_width = 200)
@@ -231,9 +232,9 @@ class MaskRCNNClient():
 
         print('Uploading...')
         grpc_result = self.stub.Predict(request)
-        print('Got prediction, destructuring result...')
 
         # Step 2
+        print('Got prediction, destructuring result...')
         grpc_mrcnn_detection = np.array(
             grpc_result.outputs["mrcnn_detection/Reshape_1"].float_val)
         grpc_mrcnn_mask = np.array(

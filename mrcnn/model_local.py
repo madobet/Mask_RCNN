@@ -74,7 +74,7 @@ class MaskRCNNLocal():
         self.model = modellib.MaskRCNN(mode="inference", model_dir=self.model_dir, config=self.cococonfig)
 
         # Load weights trained on MS-COCO
-        print("Loading weights...")
+        print("loading weights...")
         self.model.load_weights(self.coco_model_path, by_name=True)
         print(self.model.keras_model, "loaded")
 
@@ -88,15 +88,15 @@ class MaskRCNNLocal():
         print("[GPU support]>>>", tf.test.is_built_with_gpu_support())
         print("[ROCm (GPU) support]>>>", tf.test.is_built_with_rocm())
 
-        physical_devices = tf.config.list_physical_devices('GPU')
+        # physical_devices = tf.config.list_physical_devices('GPU')
         # print("[GPU info]>>>", physical_devices)
-        if physical_devices:
-            tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        # if physical_devices:
+        #     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
         from tensorflow.python.client import device_lib
         print("[Details]>>>\n", device_lib.list_local_devices())
 
-    def detect(self, img_path):
+    def detect(self, img_path, verbose=0):
         self.images = []
         if os.path.isdir(img_path):
             for file in os.listdir(img_path):
@@ -105,8 +105,7 @@ class MaskRCNNLocal():
             self.images.append(skimage.io.imread(img_path))
 
         # Run detection
-        # self.results = self.model.detect(self.images, verbose=1)
-	    self.results = self.model.detect(self.images, verbose=0)
+        self.results = self.model.detect(self.images, verbose=verbose)
 
     def display(self, title=None, figsize=(16, 16), axes=None, show_mask=True, show_bbox=True, show_label=True, fpath=None):
         """ 当 fpath 为 None 新开窗口显示结果
@@ -118,10 +117,22 @@ class MaskRCNNLocal():
             axes.cla()
         # Visualize results
         for i in range(len(self.images)):
+            # TODO 批量模式下自动按序命名文件名
             r = self.results[i]
             visualize.display_instances(self.images[i], r['rois'], r['masks'], r['class_ids'], self.class_names,
                                     r['scores'], title, figsize, axes, show_mask, show_bbox, show_label,
                                     save_path=fpath)
+
+    def out2json(self, show_mask=True, show_bbox=True, show_label=True, opath=None):
+        import json
+        # TODO 批量模式下自动按序命名文件名
+        for i in range(len(self.images)):
+            if opath:
+                with open(opath, 'w') as f:
+                    json.dump(self.results[i], f)
+            else:
+                json_str = json.dumps(self.results[i])
+                print(json_str)
 
     def debug(self):
         """ 打印调试信息
