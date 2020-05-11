@@ -24,24 +24,29 @@ def clientCLI(fpath, host=None, opath=None, width=1920, height=1080, dpi=96):
         grpc_ser.grpc_request(fpath)
         if IS_DEBUG:
             grpc_ser.debug()
-        print('Visualizing result...')
-        dpi_x: int = dpi
-        dpi_y: int = dpi
-        print("Size: %d, %d\nDPI: %d, %d" % (width, height, dpi_x, dpi_y))
-        grpc_ser.display(None, (width/dpi_x, height/dpi_y), fpath=opath)
+        if os.path.splitext(opath)[-1] == ".json":
+            grpc_ser.out2json(opath=opath)
+        else:
+            print('Visualizing result...')
+            dpi_x: int = dpi
+            dpi_y: int = dpi
+            print("Size: %d, %d\nDPI: %d, %d" % (width, height, dpi_x, dpi_y))
+            grpc_ser.display(None, (width/dpi_x, height/dpi_y), fpath=opath)
     else:
         from mrcnn.model_local import MaskRCNNLocal
         local_detect = MaskRCNNLocal()
         if IS_DEBUG:
             local_detect.devinfo()
             local_detect.detect(fpath)
-        if IS_DEBUG:
             local_detect.debug()
-        print('Visualizing result...')
-        dpi_x: int = dpi
-        dpi_y: int = dpi
-        print("Size: %d, %d\nDPI: %d, %d" % (width, height, dpi_x, dpi_y))
-        local_detect.display(None, (width/dpi_x, height/dpi_y), fpath=opath)
+        # if os.path.splitext(opath)[-1] == ".json":
+        #     local_detect.out2json(fpath=opath)
+        # else:
+        #     print('Visualizing result...')
+        #     dpi_x: int = dpi
+        #     dpi_y: int = dpi
+        #     print("Size: %d, %d\nDPI: %d, %d" % (width, height, dpi_x, dpi_y))
+        #     local_detect.display(None, (width/dpi_x, height/dpi_y), fpath=opath)
 
 def clientGUI():
     from PyQt5.QtWidgets import QApplication, QStyleFactory

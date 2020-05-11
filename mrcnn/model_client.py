@@ -259,6 +259,21 @@ class MaskRCNNClient():
                                     self.scores, title, figsize, axes, show_mask, show_bbox, show_label,
                                     save_path=fpath)
 
+    def out2json(self, show_mask=True, show_bbox=True, show_label=True, opath=None):
+        import json
+        export_result = {
+            'rois': self.rois.tolist(),
+            'class_ids': self.class_ids.tolist(),
+            'scores': self.scores.tolist(),
+            'masks': self.masks.tolist()
+        }
+        if opath:
+            with open(opath, 'w') as f:
+                json.dump(export_result, f)
+        else:
+            json_str = json.dumps(export_result)
+            print(json_str)
+
     def debug(self):
         """ 打印调试信息
         """
