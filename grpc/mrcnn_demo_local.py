@@ -80,7 +80,7 @@ def detection(image):
     print("Loaded SUCCESSED!")
 
     print(image)
-    result = model.detect([image], verbose=1) # Run detection
+    result = model.detect([image], verbose=0) # Run detection
     return result
 
 def batch_detection(images):
@@ -100,7 +100,7 @@ def batch_detection(images):
     model.load_weights(COCO_MODEL_PATH, by_name=True)
     print("Loaded SUCCESSED!")
 
-    results = model.detect(images, verbose=1) # Run detection(batch mode)
+    results = model.detect(images, verbose=0) # Run detection(batch mode)
     return results
 
 # import skimage.io

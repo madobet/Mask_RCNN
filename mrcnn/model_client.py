@@ -200,8 +200,9 @@ class MaskRCNNClient():
         return boxes, class_ids, scores, full_masks
 
 
-    def grpc_request(self, img_path):
-        """ 向服务器发起请求并将返回结果存放于 MaskRCNNClient 类中
+    def detect(self, img_path, verbose=0):
+        """ 向服务器发起请求并将返回结果存放于 MaskRCNNClient 类中，
+            保持接口一致因此名 detect
         """
         self.image = skimage.io.imread(img_path)
         # self.image = self.img_transform(image, pad_width = 200)
@@ -231,9 +232,9 @@ class MaskRCNNClient():
 
         print('Uploading...')
         grpc_result = self.stub.Predict(request)
-        print('Got prediction, destructuring result...')
 
         # Step 2
+        print('Got prediction, destructuring result...')
         grpc_mrcnn_detection = np.array(
             grpc_result.outputs["mrcnn_detection/Reshape_1"].float_val)
         grpc_mrcnn_mask = np.array(
@@ -258,6 +259,21 @@ class MaskRCNNClient():
         visualize.display_instances(self.image, self.rois, self.masks, self.class_ids, self.class_names,
                                     self.scores, title, figsize, axes, show_mask, show_bbox, show_label,
                                     save_path=fpath)
+
+    def out2json(self, show_mask=True, show_bbox=True, show_label=True, opath=None):
+        import json
+        export_result = {
+            'rois': self.rois.tolist(),
+            'class_ids': self.class_ids.tolist(),
+            'scores': self.scores.tolist(),
+            'masks': self.masks.tolist()
+        }
+        if opath:
+            with open(opath, 'w') as f:
+                json.dump(export_result, f)
+        else:
+            json_str = json.dumps(export_result)
+            print(json_str)
 
     def debug(self):
         """ 打印调试信息
