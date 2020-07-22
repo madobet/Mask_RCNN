@@ -198,7 +198,7 @@ class ClientGUI(QMainWindow):
         self.statusbar.showMessage("就绪")
 
     def actionOpenFile(self):
-        self.file_path = QFileDialog.getOpenFileUrl(self, "打开文件", filter="Images (*.png *.jpg)")
+        self.file_path = QFileDialog.getOpenFileUrl(self, "打开文件", filter="Images (*.bmp *.png *.jpg)")
         if not self.file_path[0].isValid():
             return
         self.file_name = self.file_path[0].fileName()
