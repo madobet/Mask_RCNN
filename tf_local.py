@@ -17,8 +17,6 @@ from mrcnn import visualize
 sys.path.append(os.path.join(ROOT_DIR, "samples/coco/"))  # To find local version
 import coco
 
-%matplotlib inline 
-
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
@@ -89,6 +87,5 @@ results = model.detect(image, verbose=1)
 # Visualize results
 for i in range(len(image)):
     r = results[i]
-    visualize.display_instances(image[i], r['rois'], r['masks'], r['class_ids'], 
+    visualize.display_instances(image[i], r['rois'], r['masks'], r['class_ids'],
                             class_names, r['scores'])
-    
